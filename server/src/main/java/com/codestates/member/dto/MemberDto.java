@@ -50,9 +50,11 @@ public class MemberDto {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class PatchPassword {
         private String password;
+        private String newPassword;
     }
 
     @Getter

@@ -59,13 +59,18 @@ public class MemberController {
 
     @PatchMapping("/edit/password/{m_id}")
     public ResponseEntity editPassword(@PathVariable("m_id") Long m_id,
-                                       @RequestBody MemberDto.PatchPassword requestBody) {
+                                       @Valid @RequestBody MemberDto.PatchPassword requestBody) {
         Member member = memberService.findMember(m_id);
-        String encryptedPassword = passwordEncoder.encode(requestBody.getPassword());	// Password 암호화
-        member.setPassword(encryptedPassword);
+        if(passwordEncoder.matches(requestBody.getPassword(), member.getPassword())) {
+            String encryptedPassword = passwordEncoder.encode(requestBody.getNewPassword());	// Password 암호화
+            member.setPassword(encryptedPassword);
 
-        memberService.updateMember(member);
-        return new ResponseEntity(memberMapper.MemberToMemberGetResponse(member), HttpStatus.OK);
+            memberService.updateMember(member);
+            return new ResponseEntity(memberMapper.MemberToMemberGetResponse(member), HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity("password error",HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @GetMapping("/{m_id}")
